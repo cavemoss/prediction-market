@@ -10,8 +10,10 @@ services:
       NODE_ENV: production
       SITE_URL: ${SITE_URL:?SITE_URL is required}
     ports:
-      - '3000:3000'
+      - "3000:3000"
     restart: unless-stopped
+    networks:
+      - global
 
   postgres:
     profiles: [local-postgres]
@@ -23,14 +25,22 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-replace-me}
     volumes:
       - kuest-postgres-data:/var/lib/postgresql/data
-    ports:
-      - '127.0.0.1:5432:5432'
     restart: unless-stopped
     healthcheck:
-      test: [CMD-SHELL, 'pg_isready -U ${POSTGRES_USER:-kuest} -d ${POSTGRES_DB:-kuest}']
+      test:
+        [
+          CMD-SHELL,
+          "pg_isready -U ${POSTGRES_USER:-kuest} -d ${POSTGRES_DB:-kuest}",
+        ]
       interval: 10s
       timeout: 5s
       retries: 6
+    networks:
+      - global
 
 volumes:
   kuest-postgres-data:
+
+networks:
+  global:
+    external: true
