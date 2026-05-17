@@ -11,6 +11,9 @@ COPY package.json package-lock.json ./
 RUN npm ci
 
 COPY . .
+
+ENV NODE_OPTIONS="--max-old-space-size=2048"
+ENV NEXT_BUILD_WORKERS=1
 RUN npm run build
 
 FROM node:24-bookworm-slim AS runner
